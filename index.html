@@ -511,7 +511,7 @@
         <div class="bio-text">Arͥcʜͣeͫr</div>
         <a href="#" class="button" onclick="openModal('projectsModal')">Проекты</a>
         <a href="#" class="button" onclick="openModal('donatModal')">Донат</a>
-        <a href="https://t.me/a_nvx" class="button">Связь со мной</a>
+        <a href="https://t.me/teleroot" class="button">Связь со мной</a>
     </div>
 
     <!-- Donat Modal -->
@@ -556,13 +556,13 @@
 
     <script>
         // Список доступных тем
-        const themes = ['Tinasha', 'Kurumi Tokisaki', 'Mahiru Shiina', 'Miyako Shikimori', 'Alisa Mikhailovna Kujou', 'Tsukasa Yuzaki', 'Ai Hoshino', 'Ruby Hoshino', 'Akane Kurokawa', 'Aki Adagaki', 'Terakomari Gandesblood'];
+        //const themes = ['Tinasha', 'Kurumi Tokisaki', 'Mahiru Shiina', 'Miyako Shikimori', 'Alisa Mikhailovna Kujou', 'Tsukasa Yuzaki', 'Ai Hoshino', 'Ruby Hoshino', 'Akane Kurokawa', 'Aki Adagaki', 'Terakomari Gandesblood'];
         
         // Выбор случайной темы
-        function getRandomTheme() {
-            const randomIndex = Math.floor(Math.random() * themes.length);
-            return themes[randomIndex];
-        }
+        //function getRandomTheme() {
+        //    const randomIndex = Math.floor(Math.random() * themes.length);
+        //    return themes[randomIndex];
+        //}
         
         // Проверка существования файла
         async function checkFileExists(url) {
@@ -632,7 +632,7 @@
         // Инициализация страницы
         window.onload = async function() {
             // Выбор случайной темы
-            const theme = getRandomTheme();
+            const theme = 'Columbina'; //getRandomTheme();
             
             // Установка ресурсов
             const audio = await setThemeResources(theme);
