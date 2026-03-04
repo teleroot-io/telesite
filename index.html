@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Archer Bio Page</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="start-overlay" id="startOverlay" tabindex="0" role="button" aria-label="Click on me">
@@ -35,12 +36,12 @@
     <video loop playsinline preload="auto" class="video-background" id="backgroundVideo">
         <source src="" type="video/mp4" id="videoSource">
     </video>
+
     <div class="overlay"></div>
+
     <div class="container">
         <div class="avatar-container">
-            <!-- Контейнер для изображения -->
             <div class="avatar-image" id="avatarImage"></div>
-            <!-- Контейнер для видео -->
             <video class="avatar-video" id="avatarVideo" autoplay loop muted playsinline></video>
         </div>
         <div class="bio-text">Arͥcʜͣeͫr</div>
@@ -49,7 +50,6 @@
         <a href="https://t.me/teleroot" class="button">Связь со мной</a>
     </div>
 
-    <!-- Donat Modal -->
     <div class="modal" id="donatModal">
         <div class="modal-content">
             <div class="modal-text">Реквизиты:</div>
@@ -58,10 +58,10 @@
                 <p><a href="https://app.tonkeeper.com/transfer/UQD-kzWDrVGX0QM8Itb_WF2FAvYjfDOKV6PqcQp3W0HdkC-T">Tonkeeper</a></p>
             </div>
             <a href="#" class="close-button" data-close-modal="donatModal">Закрыть</a>
+            <a href="#" class="close-button" data-close-modal="donatModal">Закрыть</a>
         </div>
     </div>
 
-    <!-- Projects Modal -->
     <div class="modal" id="projectsModal">
         <div class="modal-content">
             <div class="project-text">My Projects</div>
@@ -78,15 +78,17 @@
                 <p><a href="#">Мой бот</a></p>
             </div>
             <a href="#" class="close-button" data-close-modal="projectsModal">Назад</a>
+            <a href="#" class="close-button" data-close-modal="projectsModal">Назад</a>
         </div>
     </div>
 
-    <div class="music-control">
+    <div class="music-control" id="musicControl">
         <div class="disc" id="disc"></div>
         <span class="toggle-button" id="playPause">Play</span>
         <input type="range" min="0" max="1" step="0.1" value="0.3" class="music-slider" id="musicSlider">
         <span class="music-label">Музыка</span>
     </div>
+
     <audio id="backgroundMusic"></audio>
     <script src="script.js" defer></script>
 </body>
