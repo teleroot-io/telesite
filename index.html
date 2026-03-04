@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,11 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <div class="preloader" id="preloader">
+        <div class="preloader-symbol" id="preloaderSymbol">✦</div>
+    </div>
     <div class="start-overlay" id="startOverlay" tabindex="0" role="button" aria-label="Click on me">
         <div class="start-overlay__text">Click on me</div>
     </div>
@@ -16,6 +21,20 @@
             <path d="M6 7h12v2H6z"></path>
             <path d="M6 11h12v2H6z"></path>
             <path d="M6 15h12v2H6z"></path>
+        </svg>
+    </button>
+    <button class="share-button" id="shareButton" type="button" aria-label="Share theme" title="Share current theme">
+        <svg class="share-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+                d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z">
+            </path>
+        </svg>
+    </button>
+    <button class="focus-button" id="focusButton" type="button" aria-label="Focus Mode" title="Focus Mode">
+        <svg class="focus-button__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+                d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z">
+            </path>
         </svg>
     </button>
     <div class="theme-overlay" id="themeOverlay" aria-hidden="true">
@@ -45,9 +64,10 @@
             <video class="avatar-video" id="avatarVideo" autoplay loop muted playsinline></video>
         </div>
         <div class="bio-text">Arͥcʜͣeͫr</div>
+        <div class="typing-status" id="typingStatus"></div>
         <a href="#" class="button" data-open-modal="projectsModal">Проекты</a>
         <a href="#" class="button" data-open-modal="donatModal">Донат</a>
-        <a href="https://t.me/teleroot" class="button">Связь со мной</a>
+        <a href="https://t.me/teleroot" class="button" target="_blank">Связь со мной</a>
     </div>
 
     <div class="modal" id="donatModal">
@@ -55,9 +75,10 @@
             <div class="modal-text">Реквизиты:</div>
             <div class="donation-content">
                 <p><strong>💰 Crypto:</strong></p>
-                <p><a href="https://app.tonkeeper.com/transfer/UQD-kzWDrVGX0QM8Itb_WF2FAvYjfDOKV6PqcQp3W0HdkC-T">Tonkeeper</a></p>
+                <p><a
+                        href="https://app.tonkeeper.com/transfer/UQD-kzWDrVGX0QM8Itb_WF2FAvYjfDOKV6PqcQp3W0HdkC-T">Tonkeeper</a>
+                </p>
             </div>
-            <a href="#" class="close-button" data-close-modal="donatModal">Закрыть</a>
             <a href="#" class="close-button" data-close-modal="donatModal">Закрыть</a>
         </div>
     </div>
@@ -78,18 +99,32 @@
                 <p><a href="#">Мой бот</a></p>
             </div>
             <a href="#" class="close-button" data-close-modal="projectsModal">Назад</a>
-            <a href="#" class="close-button" data-close-modal="projectsModal">Назад</a>
         </div>
     </div>
 
     <div class="music-control" id="musicControl">
         <div class="disc" id="disc"></div>
-        <span class="toggle-button" id="playPause">Play</span>
-        <input type="range" min="0" max="1" step="0.1" value="0.3" class="music-slider" id="musicSlider">
-        <span class="music-label">Музыка</span>
+        <div class="music-right">
+            <div class="music-row">
+                <span class="toggle-button" id="playPause">Play</span>
+                <input type="range" min="0" max="1" step="0.1" value="0.3" class="music-slider" id="musicSlider">
+                <span class="music-label">Музыка</span>
+            </div>
+            <div class="music-progress" id="musicProgress">
+                <div class="music-progress__fill" id="musicProgressFill"></div>
+            </div>
+        </div>
     </div>
 
     <audio id="backgroundMusic"></audio>
+
+    <div class="toast" id="shareToast">🔗 Ссылка скопирована!</div>
+
+    <div class="theme-transition-overlay" id="themeTransitionOverlay"></div>
+    <div class="cursor-trail" id="cursorTrail"></div>
+    <div class="custom-cursor" id="customCursor"></div>
+
     <script src="script.js" defer></script>
 </body>
+
 </html>

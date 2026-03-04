@@ -151,7 +151,7 @@ function loadVideo(videoEl, url) {
         videoEl.src = url;
         videoEl.load();
 
-        videoEl.play().catch(() => {});
+        videoEl.play().catch(() => { });
     });
 }
 
@@ -268,11 +268,26 @@ window.addEventListener('DOMContentLoaded', async () => {
     const themeList = document.getElementById('themeList');
     const themeCloseButton = document.getElementById('themeCloseButton');
 
+    const themeDirs = (await fetchThemeDirectories()) ?? themes;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const chParam = urlParams.get('ch');
+
+    if (chParam) {
+        const matchedTheme = themeDirs.find(t => t.toLowerCase() === chParam.toLowerCase());
+        if (matchedTheme) {
+            saveThemeState({ mode: 'fixed', theme: matchedTheme });
+        }
+
+        const url = new URL(window.location);
+        url.searchParams.delete('ch');
+        window.history.replaceState({}, document.title, url.toString());
+    }
+
     const themeState = getThemeState();
     const effectiveTheme = themeState.mode === 'fixed' ? themeState.theme : getRandomTheme();
 
     let currentTheme = effectiveTheme;
-    const themeDirs = (await fetchThemeDirectories()) ?? themes;
 
     const { audio: musicAudio } = await setThemeResources(currentTheme);
 
@@ -283,6 +298,27 @@ window.addEventListener('DOMContentLoaded', async () => {
     const musicSlider = document.getElementById('musicSlider');
     const bgStopButton = document.getElementById('bgStopButton');
     const overlay = document.querySelector('.overlay');
+
+    const preloader = document.getElementById('preloader');
+    const preloaderSymbol = document.getElementById('preloaderSymbol');
+    if (preloaderSymbol && currentTheme) {
+        const t = currentTheme.toLowerCase();
+        if (t === 'columbina') {
+            preloaderSymbol.textContent = '🌙';
+        } else if (t === 'ai hoshino') {
+            preloaderSymbol.textContent = '★';
+        } else if (t === 'kurumi tokisaki') {
+            preloaderSymbol.textContent = 'IV';
+        } else {
+            preloaderSymbol.textContent = '✦';
+        }
+    }
+
+    if (preloader) {
+        setTimeout(() => {
+            preloader.classList.add('hidden');
+        }, 800);
+    }
 
     let menuSnapshot = null;
 
@@ -304,8 +340,30 @@ window.addEventListener('DOMContentLoaded', async () => {
             const label = document.createElement('span');
             label.textContent = item.label;
 
+            const preview = document.createElement('div');
+            preview.className = 'theme-item-preview';
+            if (item.id !== '__random__') {
+                preview.style.backgroundImage = `url('src/${encodeURIComponent(item.id)}/avatar.png')`;
+                const img = new Image();
+                img.onerror = () => {
+                    preview.style.backgroundImage = `url('src/${encodeURIComponent(item.id)}/avatar.jpg')`;
+                    const img2 = new Image();
+                    img2.onerror = () => { preview.style.display = 'none'; };
+                    img2.src = `src/${encodeURIComponent(item.id)}/avatar.jpg`;
+                };
+                img.src = `src/${encodeURIComponent(item.id)}/avatar.png`;
+            } else {
+                preview.innerHTML = '🎲';
+                preview.style.border = 'none';
+                preview.style.display = 'flex';
+                preview.style.alignItems = 'center';
+                preview.style.justifyContent = 'center';
+                preview.style.fontSize = '20px';
+            }
+
             btn.appendChild(marker);
             btn.appendChild(label);
+            btn.appendChild(preview);
             themeList.appendChild(btn);
         }
     };
@@ -373,7 +431,14 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    const themeTransitionOverlay = document.getElementById('themeTransitionOverlay');
+
     const applyTheme = async (nextThemeState) => {
+        if (themeTransitionOverlay) {
+            themeTransitionOverlay.classList.add('active');
+            await new Promise(r => setTimeout(r, 400)); // wait for fade out
+        }
+
         saveThemeState(nextThemeState);
         currentTheme = nextThemeState.mode === 'fixed' ? nextThemeState.theme : getRandomTheme();
 
@@ -386,6 +451,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         await setThemeResources(currentTheme);
         renderThemeList();
 
+        const customCursor = document.getElementById('customCursor');
+        if (customCursor) {
+            customCursor.className = 'custom-cursor';
+            const themeClass = 'theme-' + currentTheme.toLowerCase().replace(/\s+/g, '-');
+            customCursor.classList.add(themeClass);
+        }
+
         const s = getSoundState();
         s.musicIsPlaying = false;
         s.avatarAudioActive = false;
@@ -395,10 +467,18 @@ window.addEventListener('DOMContentLoaded', async () => {
         bgStopButton.classList.remove('is-stopped');
         setAudioFocus('background', { backgroundVideo, avatarVideo, musicAudio });
 
+        // Fix: Reset music button text and state on theme switch
+        if (playPauseButton) playPauseButton.textContent = 'Play';
+        if (musicControl) musicControl.classList.remove('playing');
+
         try {
             await backgroundVideo.play();
         } catch (e) {
             console.log('Video play failed:', e);
+        }
+
+        if (themeTransitionOverlay) {
+            themeTransitionOverlay.classList.remove('active');
         }
     };
 
@@ -479,13 +559,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     projectsModal.style.display = 'none';
 
     // Закрытие модальных окон при клике вне контента
-    donatModal.addEventListener('click', function(event) {
+    donatModal.addEventListener('click', function (event) {
         if (event.target === this) {
             closeModal('donatModal');
         }
     });
 
-    projectsModal.addEventListener('click', function(event) {
+    projectsModal.addEventListener('click', function (event) {
         if (event.target === this) {
             closeModal('projectsModal');
         }
@@ -497,7 +577,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         bgStopButton.style.bottom = '20px';
     }, 100);
 
-    playPauseButton.addEventListener('click', async function() {
+    playPauseButton.addEventListener('click', async function () {
         const current = getSoundState();
         const shouldPlayMusic = !current.musicIsPlaying;
 
@@ -572,7 +652,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         await switchToBackgroundAudio();
     });
 
-    musicSlider.addEventListener('input', function() {
+    musicSlider.addEventListener('input', function () {
         const volume = Number(this.value);
         musicAudio.volume = volume;
         backgroundVideo.volume = volume;
@@ -583,7 +663,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         saveSoundState(current);
     });
 
-    avatarVideo.addEventListener('click', async function() {
+    avatarVideo.addEventListener('click', async function () {
         if (avatarVideo.style.display === 'none') return;
 
         const current = getSoundState();
@@ -604,7 +684,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         musicControl.classList.remove('playing');
     });
 
-    bgStopButton.addEventListener('click', async function() {
+    bgStopButton.addEventListener('click', async function () {
         const current = getSoundState();
         current.bgStopped = !current.bgStopped;
 
@@ -662,9 +742,166 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     startOverlay.addEventListener('click', handleStart);
     startOverlay.addEventListener('keydown', handleStartKeydown);
+
+    // --- Typing Status ---
+    const typingStatus = document.getElementById('typingStatus');
+    const statuses = ['Welcome to my world...', 'Lover of Anime', 'Developer', 'Creator'];
+    let statusIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
+    function typeStatus() {
+        if (!typingStatus) return;
+        const currentText = statuses[statusIndex];
+
+        if (isDeleting) {
+            typingStatus.textContent = currentText.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            typingStatus.textContent = currentText.substring(0, charIndex + 1);
+            charIndex++;
+        }
+
+        let typeSpeed = isDeleting ? 40 : 100;
+
+        if (!isDeleting && charIndex === currentText.length) {
+            typeSpeed = 2000;
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            statusIndex = (statusIndex + 1) % statuses.length;
+            typeSpeed = 500;
+        }
+        setTimeout(typeStatus, typeSpeed);
+    }
+    typeStatus();
+
+    // --- Share Button ---
+    const shareButton = document.getElementById('shareButton');
+    const shareToast = document.getElementById('shareToast');
+    let toastTimeout = null;
+
+    if (shareButton && shareToast) {
+        shareButton.addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            url.searchParams.set('ch', currentTheme);
+            navigator.clipboard.writeText(url.toString()).then(() => {
+                shareToast.classList.add('show');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => shareToast.classList.remove('show'), 2500);
+            }).catch(() => {
+                // fallback
+                const el = document.createElement('textarea');
+                el.value = url.toString();
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                shareToast.classList.add('show');
+                clearTimeout(toastTimeout);
+                toastTimeout = setTimeout(() => shareToast.classList.remove('show'), 2500);
+            });
+        });
+    }
+
+    // --- Custom Cursor & Trail ---
+    const customCursor = document.getElementById('customCursor');
+    const cursorTrail = document.getElementById('cursorTrail');
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let trailX = window.innerWidth / 2;
+    let trailY = window.innerHeight / 2;
+
+    if (customCursor && cursorTrail) {
+
+        // init theme class
+        const initialThemeClass = 'theme-' + currentTheme.toLowerCase().replace(/\s+/g, '-');
+        customCursor.classList.add(initialThemeClass);
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            customCursor.style.left = mouseX + 'px';
+            customCursor.style.top = mouseY + 'px';
+        });
+
+        const updateTrail = () => {
+            trailX += (mouseX - trailX) * 0.2;
+            trailY += (mouseY - trailY) * 0.2;
+            cursorTrail.style.left = trailX + 'px';
+            cursorTrail.style.top = trailY + 'px';
+            requestAnimationFrame(updateTrail);
+        };
+        updateTrail();
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest('button, a, input, .theme-item, .start-overlay, .theme-menu, .bg-stop')) {
+                customCursor.classList.add('hovering');
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest('button, a, input, .theme-item, .start-overlay, .theme-menu, .bg-stop')) {
+                customCursor.classList.remove('hovering');
+            }
+        });
+    }
+
+    // --- Music Progress Logic ---
+    const musicProgress = document.getElementById('musicProgress');
+    const musicProgressFill = document.getElementById('musicProgressFill');
+
+    if (musicAudio && musicProgress && musicProgressFill) {
+        musicAudio.addEventListener('timeupdate', () => {
+            if (musicAudio.duration) {
+                const percent = (musicAudio.currentTime / musicAudio.duration) * 100;
+                musicProgressFill.style.width = percent + '%';
+            }
+        });
+
+        musicProgress.addEventListener('click', (e) => {
+            const rect = musicProgress.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const width = rect.width;
+            const percent = x / width;
+            musicAudio.currentTime = percent * musicAudio.duration;
+        });
+    }
+    // --- Focus Mode (Chill Mode) ---
+    const focusButton = document.getElementById('focusButton');
+    if (focusButton) {
+        focusButton.addEventListener('click', () => {
+            document.body.classList.toggle('focus-mode');
+            const isActive = document.body.classList.contains('focus-mode');
+            focusButton.classList.toggle('active', isActive);
+        });
+    }
+
+    // --- Magnetic Interaction ---
+    const magneticElements = document.querySelectorAll('button, a, .theme-item, .bg-stop');
+
+    magneticElements.forEach(el => {
+        el.addEventListener('mousemove', (e) => {
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+
+            // Apply a small translation (max 10px) towards the cursor
+            const moveX = x * 0.3;
+            const moveY = y * 0.3;
+
+            el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        });
+
+        el.addEventListener('mouseleave', () => {
+            el.style.transform = 'translate(0, 0)';
+        });
+    });
+
 });
 
 // Экспортируем функции для inline-обработчиков
 window.openModal = openModal;
 window.closeModal = closeModal;
 window.preventDefaultLinkClick = preventDefaultLinkClick;
+
