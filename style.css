@@ -55,25 +55,35 @@ body {
 }
 .sys-status .status-right { display: flex; gap: 10px; }
 
+.floating-actions {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 4;
+}
+
 .theme-menu, .focus-button, .terminal-toggle-btn {
-    position: fixed; right: 20px; z-index: 4;
     width: 44px; height: 44px; border: 1px solid var(--main-color);
     background: rgba(0, 0, 0, 0.8); color: var(--main-color);
     cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
     padding: 0; box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); transition: all 0.2s ease;
-    font-family: var(--font-stack); font-weight: bold;
+    font-family: var(--font-stack); font-weight: bold; border-radius: 5px;
 }
-.theme-menu { top: 40px; }
-.focus-button { top: 94px; }
-.terminal-toggle-btn { top: 148px; font-size: 18px; }
+.terminal-toggle-btn { font-size: 18px; }
 
 .theme-menu:hover, .focus-button:hover, .terminal-toggle-btn:hover, .focus-button.active {
     background: var(--main-color); color: #000; box-shadow: 0 0 15px var(--main-color);
 }
 .theme-menu__icon, .focus-button__icon { width: 20px; height: 20px; fill: currentColor; }
 
-body.focus-mode .container, body.focus-mode .theme-menu, body.focus-mode .terminal-toggle-btn { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-body.focus-mode .focus-button { opacity: 0.3; }
+body.focus-mode .container, body.focus-mode .floating-actions { opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+body.focus-mode .floating-actions .focus-button { opacity: 0.3; pointer-events: auto; }
+body.focus-mode .floating-actions { opacity: 1; }
+body.focus-mode .floating-actions .theme-menu, body.focus-mode .floating-actions .terminal-toggle-btn { display: none; }
 body.focus-mode .focus-button:hover { opacity: 1; }
 
 .preloader {
@@ -205,15 +215,36 @@ body.focus-mode .focus-button:hover { opacity: 1; }
 @keyframes glitch-anim-2 { 0% { clip: rect(4px, 9999px, 22px, 0); } 100% { clip: rect(11px, 9999px, 96px, 0); } }
 
 @media (max-width: 600px) {
-    .sys-status { font-size: 11px; padding: 5px; justify-content: center; gap: 20px; }
+    .sys-status { font-size: 10px; padding: 5px; justify-content: center; gap: 15px; }
     .desktop-only { display: none; }
+    
+    .container { padding: 15px; padding-bottom: 70px; margin-top: 15px; }
     .bio-text { font-size: 28px; }
+    .terminal-prefix { font-size: 14px; margin-bottom: 15px; }
+    
     .avatar-image-wrapper { padding: 3px; }
     .avatar-image { width: 90px; height: 90px; }
+    
     .button { font-size: 14px; padding: 10px; }
-    .terminal-shell { font-size: 12px; padding: 8px; }
+    
+    .terminal-shell { font-size: 12px; padding: 8px; margin-bottom: 20px; }
     .shell-input { font-size: 12px; }
-    .theme-menu { top: 35px; width: 38px; height: 38px; }
-    .focus-button { top: 85px; width: 38px; height: 38px; }
-    .terminal-toggle-btn { top: 135px; width: 38px; height: 38px; font-size: 14px; }
+    
+    .floating-actions { 
+        top: auto; 
+        bottom: 15px; 
+        right: 15px; 
+        transform: none; 
+        flex-direction: row; 
+        gap: 10px; 
+    }
+    .theme-menu, .focus-button, .terminal-toggle-btn { 
+        width: 38px; 
+        height: 38px; 
+        font-size: 14px; 
+    }
+
+    .modal-content { max-height: 80vh; overflow-y: auto; width: 95%; padding: 0;}
+    .modal-body { padding: 15px; }
+    .theme-panel { width: 90%; max-height: 70vh; }
 }
